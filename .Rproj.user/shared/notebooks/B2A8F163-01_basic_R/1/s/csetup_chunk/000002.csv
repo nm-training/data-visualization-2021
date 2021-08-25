@@ -1,0 +1,6 @@
+"0","knitr::opts_chunk$set(warning = FALSE, message = FALSE)"
+"0","options(htmltools.dir.version = FALSE, servr.daemon = TRUE, "
+"0","        htmltools.preserve.raw = FALSE)"
+"0","library(countdown)"
+"0","library(xaringanExtra)"
+"0","xaringanExtra::use_panelset()"

@@ -1,0 +1,359 @@
+---
+title: "Day 3"
+subtitle: "Custom Visualization - I"
+author: "Sanjay Hamal"
+institute: "Numeric Mind"
+date: " `r Sys.Date()`"
+output: 
+  xaringan::moon_reader:
+    # beforeInit: "macros.js"
+    df_print: paged
+    lib_dir: libs
+    css: ["default", "default-fonts", "style.css"]
+    chakra: libs/remark-latest.min.js
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+    seal: true
+    mathjax: NULL
+---
+
+layout: true
+<div class="my-header"></div>
+<div class="my-footer"><img src="imgs/nm-logo.png"/></div> 
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.height = 5,
+  fig.show = "hide",
+  fig.path = "figures/",
+  fig.retine = 5,
+  message = FALSE,
+  warning = FALSE,
+  cache = T,
+  cache.path = "cache/",
+  dev = "ragg_png"
+)
+
+
+options(
+  htmltools.dir.version = FALSE, servr.daemon = TRUE,
+  htmltools.preserve.raw = FALSE
+)
+library(countdown)
+library(dplyr)
+library(kableExtra)
+
+xaringanExtra::use_panelset()
+xaringanExtra::html_dependency_webcam()
+
+# xaringan::summon_remark()
+```
+
+---
+class: middle, center
+
+# Data Visualization with
+
+<img src="imgs/ggplot2.png" width="20%">
+
+
+---
+class: middle, center
+
+# Data Visualization with
+
+
+```{r}
+covid19_nepal <- readRDS("covid19_nepal.rds")
+
+
+deaths <- covid19_nepal %>% filter(date > "2021-01-01", cases == "deaths")
+
+
+deaths                         
+
+
+```
+
+
+```{r}
+
+library(systemfonts)
+
+library(dplyr)
+library(stringr)
+
+system_fonts() %>% 
+  filter(family == "Alegreya") %>% 
+  transmute(
+    family, style,
+    file = str_extract(path, "[\\w-]+\\.ttf$")
+  )
+
+library(extrafont)
+library(ggplot2)
+
+ggplot(NULL, aes(0, 0)) +
+  geom_text(
+    aes(label = "The Alegreya font"),
+    size = 18
+  )
+
+loadfonts(device = "win", quiet = TRUE)
+
+
+
+library(ggplot2)
+library(ragg)
+
+deaths_plot <- ggplot(deaths, aes(date, daily_count)) +
+  geom_line()
+
+library(showtext)
+ deaths_plot +
+  labs(title = "कोभिद १९ मृतु सन्ख्या ", 
+       caption = "Hello 2") +
+  # scale_x_date(date_labels = c(" ", "A", "B")) +
+  
+  theme(text = element_text(family = "Kantipur", size = 16))
+
+a
+
+ggsave("./plot_deaths.png")
+
+??ggsave
+
+```
+
+```{r}
+library(lubridate)
+library(tidyverse)
+
+date_diff <- as.Date("2078-05-08") - as.Date("2021-08-24")
+
+covid19_nepal <- readRDS("covid19_nepal.rds")
+
+
+deaths <- covid19_nepal %>% filter(date > "2021-01-01", cases == "deaths")
+
+
+deaths_nep <- deaths %>% 
+  mutate(nepali_date = as.Date(date + date_diff), 
+         nepali_month = month(nepali_date))
+
+
+nep_months <- c("वैशाख","जेठ","असार","साउन","भदौ","असोज","कात्तिक","मंसिर","पुष","माघ","फागुन","चैत") 
+
+
+nep_months[1]
+
+
+n_month <- function(data, var_name, col){
+  data %>% 
+    mutate({{ var_name }} :=
+  case_when(
+    {{col}} == 1 ~ nep_months[1], 
+     {{col}} == 2 ~ nep_months[2], 
+     {{col}} == 3 ~ nep_months[3], 
+     {{col}} == 4 ~ nep_months[4], 
+     {{col}} == 5 ~ nep_months[5], 
+     {{col}} == 6 ~ nep_months[6], 
+     {{col}} == 7 ~ nep_months[7], 
+     {{col}} == 8 ~ nep_months[8], 
+     {{col}} == 9 ~ nep_months[9], 
+     {{col}} == 10 ~ nep_months[10], 
+     {{col}} == 11 ~ nep_months[11], 
+     {{col}} == 12 ~ nep_months[12]
+  ))
+} 
+
+aa %>% View
+
+
+deaths_nep_month <- n_month(deaths_nep, n_month, nepali_month)
+
+deaths_nep_month %>% View()
+
+library(tidyverse)
+
+library(extrafont)
+# font_import(pattern="Preeti")
+
+library(stringr)
+
+
+a <- "apple"
+
+
+
+str_replace_all(a, "a", "P")
+str_replace
+
+
+
+# 57 years, 8 months and 16 days
+
+
+
+library(lubridate)
+
+deaths_nep <- deaths_nep_month  %>%
+  distinct(nepali_month, .keep_all = T)
+  
+
+
+# deaths_nep %>%
+
+
+deaths_plot <- ggplot(deaths_nep, aes(nepali_date, daily_count)) +
+  geom_line()
+
+
+# 
+# breaks = nepal_date(english_date)
+# labels = nepali_month(month)
+
+
+deaths_plot +
+  labs(title = "कोभिद १९ मृतु सन्ख्या ", 
+       caption = "Hello 2") +
+  # scale_x_date(date_breaks = "4 month", label =  function(x) paste0(format(x, "%b"), b)) +
+  scale_x_date(breaks = as.Date(c("2078-01-01", "2078-04-05")), labels = c(nep_months[1], nep_months[4]))+
+    # geom_text(aes(label=y),nudge_x=0.5,family="Roboto")+
+  theme()
+
+
+
+deaths_plot +
+  labs(title = "कोभिद १९ मृतु सन्ख्या ", 
+       caption = "Hello 2") +
+  # scale_x_date(date_breaks = "4 month", label =  function(x) paste0(format(x, "%b"), b)) +
+  scale_x_date(breaks = deaths_nep$nepali_date, labels = deaths_nep$n_month)+
+    # geom_text(aes(label=y),nudge_x=0.5,family="Roboto")+
+
+  bbplot::bbc_style()
+
+```
+
+# number conversion
+
+```{r}
+
+devnagari <- c("०", "१", "२", "३", "४", "५", "६", "७", "८", "९") 
+
+
+
+numbers <- data.frame(num =  c("1000", "12342323", "1224324232", "2323233", "1234567890"))
+
+
+
+a <- numbers %>% 
+  mutate(dev_num = str_replace_all(num, c("0" = devnagari[1],
+                                          "1" = devnagari[2], 
+                                          "2" = devnagari[3], 
+                                          "3" = devnagari[4], 
+                                          "4" = devnagari[5], 
+                                          "5" = devnagari[6], 
+                                          "6" = devnagari[7], 
+                                          "7" = devnagari[8], 
+                                          "8" = devnagari[9], 
+                                          "9" = devnagari[10])))
+
+
+View(a)
+
+
+```
+
+
+
+
+```{r}
+library(lubridate)
+library(tidyverse)
+library(nepalidate)
+library(ragg)
+library(scales)
+
+date_diff <- as.Date("2078-05-08") - as.Date("2021-08-24")
+
+covid19_nepal <- readRDS("covid19_nepal.rds")
+
+
+deaths <- covid19_nepal %>% filter(date > "2021-01-01", cases == "deaths")
+
+
+deaths_nep <- deaths %>% 
+  mutate(nepali_date = as.Date(date + date_diff), 
+         nepali_month = month(nepali_date))
+
+# library(lubridate)
+
+
+a <- cut(deaths_nep$daily_count, breaks = 4, include.lowest = T)
+abc <- data.frame(val = levels(a))
+abc$vv <- str_extract(abc$val, ",.*")  
+bb <-  data.frame(val = str_replace_all(abc$vv, ",|]", ""))
+
+
+
+bbc <- bb %>% 
+  mutate(breaks = case_when(
+    between(val, 0, 50) ~ 50,
+    between(val, 50, 100) ~ 100,
+    between(val, 100, 150) ~ 150,
+    between(val, 150, 200) ~ 200,
+    between(val, 200, 300) ~ 300, 
+    between(val, 300, 400) ~ 400,
+    between(val, 400, 500) ~ 500,
+    between(val, 500, 600) ~ 600,
+    between(val, 600, 800) ~ 800,
+    between(val, 800, 1000) ~ 1000, 
+    between(val, 1000, 5000) ~ 5000, 
+    between(val, 5000, 10000) ~ 10000, 
+    between(val, 10000, 20000) ~ 20000
+  )) %>% 
+  add_row(val=NA, breaks = 0, .before=1)
+
+
+deaths_nep <- nepali_month(deaths_nep, col = nepali_month)
+
+deaths_break <- nepali_number(bbc, col = breaks) 
+
+
+
+# deaths_nep %>%
+
+deaths_nepa <- deaths_nep  %>%
+  group_by(nepali_month) %>% 
+  mutate(total_count = sum(daily_count), 
+         start_month = as.Date(paste0(year(nepali_date), "-", month(nepali_date),"-01"))) %>% 
+  ungroup() 
+
+months_break <- deaths_nepa %>%  distinct(nepali_month, .keep_all = T) 
+
+
+ggplot(months_break, aes(nepali_date, total_count)) +
+  geom_line() +
+  labs(title = "कोभिद १९ मृतु सन्ख्या | २०७८ डाटा ") +
+  # scale_x_date(date_breaks = "4 month", label =  function(x) paste0(format(x, "%b"), b)) +
+  scale_x_date(breaks = months_break$start_month, labels = unique(months_break$nepali_month))+
+  # scale_y_continuous(breaks = deaths_break$breaks, labels = deaths_break$nepali_number) +
+  # scale_y_continuous(breaks = NULL) +
+    # geom_text(aes(label=y),nudge_x=0.5,family="Roboto")+
+  bbplot::bbc_style()
+```
+
+
+
+
+
+
+
+
+
+
